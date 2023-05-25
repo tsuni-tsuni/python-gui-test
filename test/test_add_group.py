@@ -1,5 +1,5 @@
-def test_add_group(app, json_groups):
-    group = json_groups
+def test_add_group(app, excel_groups):
+    group = excel_groups
     old_list = app.group.get_group_list()
     app.group.add_new_group(group)
     new_list = app.group.get_group_list()

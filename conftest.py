@@ -2,7 +2,9 @@ import pytest
 import os.path
 import jsonpickle
 import importlib
+import pandas as pd
 from fixture.application import Application
+from model.group import Group
 
 
 @pytest.fixture(scope="session")
@@ -20,6 +22,9 @@ def pytest_generate_tests(metafunc):
         elif fixture.startswith("json_"):
             testdata = load_from_json(fixture[5:])
             metafunc.parametrize(fixture, testdata, ids=[str(x) for x in testdata])
+        elif fixture.startswith("excel_"):
+            testdata = load_from_excel(fixture[6:])
+            metafunc.parametrize(fixture, testdata, ids=[str(x) for x in testdata])
 
 
 def load_from_module(module):
@@ -29,3 +34,11 @@ def load_from_module(module):
 def load_from_json(file):
     with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "data/%s.json" % file)) as f:
         return jsonpickle.decode(f.read())
+
+
+def load_from_excel(file):
+    f = os.path.join(os.path.dirname(os.path.abspath(__file__)), "%s.xlsx" % file)
+    data = pd.read_excel(f)
+    list = data['Name'].tolist()
+    groups = [Group(name=x) for x in list]
+    return groups
